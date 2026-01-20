@@ -19,7 +19,7 @@ namespace ImFlow
             // Nodes are side by side: curve both ends up or both down
             float arcHeight = 0.15f * distance + 10.0f;
             // Pick up or down based on available space, or always up for simplicity
-            vert = arcHeight;
+            vert = -arcHeight;
             float rightward = fmaxf(minRight, delta * 0.3f);
             p11 = p1 + ImVec2(rightward, vert);
             p22 = p2 + ImVec2(-rightward, vert); // both control points curve the same direction
