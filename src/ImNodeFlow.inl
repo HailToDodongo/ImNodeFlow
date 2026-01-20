@@ -18,17 +18,22 @@ namespace ImFlow
         if (horizontalDist > verticalDist && verticalDist < 60.0f) {
             // Nodes are side by side: use angular path (right, up/down, right, down)
             float offset = 30.0f; // how far to go right from p1
-            float up = (p2.y <= p1.y) ? -45.0f : 45.0f; // go up or down depending on target
+            float up = (p2.y <= p1.y) ? -50.0f : 50.0f; // go up or down depending on target
             ImVec2 pA = p1 + ImVec2(offset, 0);
             ImVec2 pB = ImVec2(pA.x, p1.y + up);
             ImVec2 pC = ImVec2(p2.x - offset, p1.y + up);
             ImVec2 pD = ImVec2(p2.x - offset, p2.y);
-            ImVec2 pE = p2;
-            dl->AddLine(p1, pA, color, thickness);
-            dl->AddLine(pA, pB, color, thickness);
-            dl->AddLine(pB, pC, color, thickness);
-            dl->AddLine(pC, pD, color, thickness);
-            dl->AddLine(pD, pE, color, thickness);
+          
+            auto pBMid = pB + ImVec2{-offset, 0};
+            auto pCMid = pC + ImVec2{offset, 0};
+
+            dl->AddLine(pBMid, pCMid, color, thickness);
+            pBMid.y += 0.5f;
+            dl->AddBezierCubic(p1, pA, pB, pBMid, color, thickness);
+            pCMid.x += 1;
+            pCMid.y += 0.5f;
+            dl->AddBezierCubic(pCMid, pC, pD, p2, color, thickness);
+          
         } else if (p2.x >= p1.x) {
             // Standard rightward connection
             p11 = p1 + ImVec2(delta, vert);
