@@ -13,7 +13,17 @@ namespace ImFlow
         float minRight = 80.0f; // Minimum rightward offset for leftward or downward connections
         float vert = 0.f;
         ImVec2 p11, p22;
-        if (p2.x >= p1.x) {
+        float horizontalDist = p1.x - p2.x;
+        float verticalDist = fabsf(p2.y - p1.y);
+        if (horizontalDist > verticalDist && verticalDist < 60.0f) {
+            // Nodes are side by side: curve both ends up or both down
+            float arcHeight = 0.15f * distance + 10.0f;
+            // Pick up or down based on available space, or always up for simplicity
+            vert = arcHeight;
+            float rightward = fmaxf(minRight, delta * 0.3f);
+            p11 = p1 + ImVec2(rightward, vert);
+            p22 = p2 + ImVec2(-rightward, vert); // both control points curve the same direction
+        } else if (p2.x >= p1.x) {
             // Standard rightward connection
             p11 = p1 + ImVec2(delta, vert);
             p22 = p2 - ImVec2(delta, vert);
@@ -21,7 +31,7 @@ namespace ImFlow
             // Leftward or downward connection: go right first, then arc
             float arcHeight = 0.35f * distance + 30.0f;
             float rightward = fmaxf(minRight, delta * 0.4f);
-            if (fabsf(p2.y - p1.y) < 40.0f) {
+            if (verticalDist < 40.0f) {
                 vert = (p2.y >= p1.y) ? arcHeight : -arcHeight;
             } else {
                 vert = (p2.y > p1.y) ? arcHeight : -arcHeight;

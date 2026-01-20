@@ -51,8 +51,9 @@ struct NodeEditor : ImFlow::BaseNode {
         if (r > 0) {
             auto node0 = mINF.addNode<SimpleSum>({100, 50});
             auto node1 = mINF.addNode<SimpleSum>({225, 70});
-            //node1->getIns()[0]->createLink(node0->getOuts()[0]);
+            
             node0->getOuts()[0]->createLink(node1->getIns()[0].get());
+            node1->getOuts()[0]->createLink(node0->getIns()[0].get());
             
         }
     }
