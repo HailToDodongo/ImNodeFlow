@@ -7,8 +7,8 @@ public:
     SimpleSum() {
         setTitle("Simple sum");
         setStyle(ImFlow::NodeStyle::green());
-        ImFlow::BaseNode::addIN<int>("In", 0, ImFlow::ConnectionFilter::SameType());
-        ImFlow::BaseNode::addOUT<int>("Out", nullptr)->behaviour([this]() { return getInVal<int>("In") + m_valB; });
+        ImFlow::BaseNode::addIN<int>("In", ImFlow::ConnectionFilter::SameType());
+        ImFlow::BaseNode::addOUT<int>("Out", nullptr);//->behaviour([this]() { return getInVal<int>("In") + m_valB; });
     }
 
     void draw() override {
@@ -25,9 +25,9 @@ public:
     CollapsingNode() {
         setTitle("Collapsing node");
         setStyle(ImFlow::NodeStyle::red());
-        ImFlow::BaseNode::addIN<int>("In", 0, ImFlow::ConnectionFilter::SameType());
-        ImFlow::BaseNode::addIN<int>("Other", 0, ImFlow::ConnectionFilter::SameType());
-        ImFlow::BaseNode::addOUT<int>("Out", nullptr)->behaviour([this]() { return getInVal<int>("In") + m_valB; });
+        ImFlow::BaseNode::addIN<int>("In", ImFlow::ConnectionFilter::SameType());
+        ImFlow::BaseNode::addIN<int>("Other", ImFlow::ConnectionFilter::SameType());
+        ImFlow::BaseNode::addOUT<int>("Out", nullptr);//->behaviour([this]() { return getInVal<int>("In") + m_valB; });
     }
 
     void draw() override {
@@ -49,8 +49,11 @@ struct NodeEditor : ImFlow::BaseNode {
     NodeEditor(float d, std::size_t r) : BaseNode() {
         mINF.setSize({d, d});
         if (r > 0) {
-            mINF.addNode<SimpleSum>({0, 0});
-            mINF.addNode<SimpleSum>({10, 10});
+            auto node0 = mINF.addNode<SimpleSum>({100, 50});
+            auto node1 = mINF.addNode<SimpleSum>({225, 70});
+            //node1->getIns()[0]->createLink(node0->getOuts()[0]);
+            node0->getOuts()[0]->createLink(node1->getIns()[0].get());
+            
         }
     }
 
