@@ -10,6 +10,7 @@ namespace ImFlow
         ImDrawList* dl = ImGui::GetWindowDrawList();
         float distance = sqrtf((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
         float delta = distance * 0.45f;
+        float minRight = 80.0f; // Minimum rightward offset for leftward or downward connections
         float vert = 0.f;
         ImVec2 p11, p22;
         if (p2.x >= p1.x) {
@@ -17,17 +18,16 @@ namespace ImFlow
             p11 = p1 + ImVec2(delta, vert);
             p22 = p2 - ImVec2(delta, vert);
         } else {
-            // Leftward connection: arc above or below
-            float arcHeight = 0.35f * distance + 40.0f; // Add a minimum arc
+            // Leftward or downward connection: go right first, then arc
+            float arcHeight = 0.35f * distance + 30.0f;
+            float rightward = fmaxf(minRight, delta * 0.4f);
             if (fabsf(p2.y - p1.y) < 40.0f) {
-                // If nodes are roughly aligned vertically, arc up or down
                 vert = (p2.y >= p1.y) ? arcHeight : -arcHeight;
             } else {
-                // If nodes are offset vertically, arc toward the outside
                 vert = (p2.y > p1.y) ? arcHeight : -arcHeight;
             }
-            p11 = p1 + ImVec2(delta * 0.2f, vert);
-            p22 = p2 - ImVec2(delta * 0.2f, vert);
+            p11 = p1 + ImVec2(rightward, vert);
+            p22 = p2 - ImVec2(rightward, vert);
         }
         dl->AddBezierCubic(p1, p11, p22, p2, color, thickness);
     }
