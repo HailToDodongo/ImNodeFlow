@@ -16,17 +16,24 @@ namespace ImFlow
         float horizontalDist = p1.x - p2.x;
         float verticalDist = fabsf(p2.y - p1.y);
         if (horizontalDist > verticalDist && verticalDist < 60.0f) {
-            // Nodes are side by side: curve both ends up or both down
-            float arcHeight = 0.15f * distance + 10.0f;
-            // Pick up or down based on available space, or always up for simplicity
-            vert = -arcHeight;
-            float rightward = fmaxf(minRight, delta * 0.3f);
-            p11 = p1 + ImVec2(rightward, vert);
-            p22 = p2 + ImVec2(-rightward, vert); // both control points curve the same direction
+            // Nodes are side by side: use angular path (right, up/down, right, down)
+            float offset = 30.0f; // how far to go right from p1
+            float up = (p2.y <= p1.y) ? -45.0f : 45.0f; // go up or down depending on target
+            ImVec2 pA = p1 + ImVec2(offset, 0);
+            ImVec2 pB = ImVec2(pA.x, p1.y + up);
+            ImVec2 pC = ImVec2(p2.x - offset, p1.y + up);
+            ImVec2 pD = ImVec2(p2.x - offset, p2.y);
+            ImVec2 pE = p2;
+            dl->AddLine(p1, pA, color, thickness);
+            dl->AddLine(pA, pB, color, thickness);
+            dl->AddLine(pB, pC, color, thickness);
+            dl->AddLine(pC, pD, color, thickness);
+            dl->AddLine(pD, pE, color, thickness);
         } else if (p2.x >= p1.x) {
             // Standard rightward connection
             p11 = p1 + ImVec2(delta, vert);
             p22 = p2 - ImVec2(delta, vert);
+            dl->AddBezierCubic(p1, p11, p22, p2, color, thickness);
         } else {
             // Leftward or downward connection: go right first, then arc
             float arcHeight = 0.35f * distance + 30.0f;
@@ -38,8 +45,8 @@ namespace ImFlow
             }
             p11 = p1 + ImVec2(rightward, vert);
             p22 = p2 - ImVec2(rightward, vert);
+            dl->AddBezierCubic(p1, p11, p22, p2, color, thickness);
         }
-        dl->AddBezierCubic(p1, p11, p22, p2, color, thickness);
     }
 
     inline bool smart_bezier_collider(const ImVec2& p, const ImVec2& p1, const ImVec2& p2, float radius)
