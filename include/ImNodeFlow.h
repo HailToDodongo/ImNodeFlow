@@ -2,6 +2,7 @@
 #define IM_NODE_FLOW
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
